@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Path
+from fastapi import FastAPI,Path,HTTPException,Query
 import json
 app=FastAPI()
 
@@ -28,5 +28,27 @@ def fetchpatient(patient_id:str=Path(...,description='id of patient in DB',examp
     data=load_data()
     if patient_id in data:
         return data[patient_id]
-    return {'error':'patient not found '}
+    raise HTTPException(status_code=404,detail='patient id not found in DB')
+
+@app.get('/sort')
+def sort_patients(sort_by:str=Query(...,detail='sort on basis of key'),order_by:str=Query('asc',detail='sort in either ascending or descending')):
+    data=load_data()
+    valid_fields=['height','age','bmi']
+    valid_sort=['asc','desc']
+    if sort_by not in valid_fields:
+        raise HTTPException(status_code=400,detail='choose valid field')
+    if order_by not in valid_sort:
+        raise HTTPException(status_code=400,detail='choose valid order by option either asc or desc')
+    if order_by =='desc':
+        order_by=False
+    else:
+        order_by=True
+
+
+    sorted_data=sorted(data.values(),key=lambda x:x.get(sort_by,0),reverse=order_by)
+    return sorted_data
+
+
+
+
 
