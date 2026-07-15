@@ -2,7 +2,7 @@ from fastapi import FastAPI,Path,HTTPException,Query
 from fastapi.responses import JSONResponse
 import json
 from pydantic import BaseModel,Field,computed_field,model_validator
-from typing import Annotated,Literal
+from typing import Annotated,Literal,Optional
 app=FastAPI()
 
 class Patient(BaseModel):
@@ -13,6 +13,7 @@ class Patient(BaseModel):
     gender:Annotated[Literal['male','female','other'],Field(...,description='gender of patient')]
     height:Annotated[float,Field(...,gt=0.0,description='height of patient in ms')]
     weight:Annotated[float,Field(...,gt=0,description='weight of patient in kgs')]
+ 
 
     @computed_field
     @property
@@ -30,6 +31,18 @@ class Patient(BaseModel):
             return 'Normal'
         else:
             return 'Obese'
+        
+
+class patientupdate(BaseModel):
+  
+    name:Annotated[Optional[str],Field(default=None,description='name of patient',examples=['moosa'])]
+    city:Annotated[Optional[str],Field(default=None,description='city of patient',examples=['faislabad'])]
+    age:Annotated[Optional[int],Field(default=None,description='age of patient',examples=['30'],gt=0)]
+    gender:Annotated[Optional[Literal['male','female','other']],Field(default=None,description='gender of patient')]
+    height:Annotated[Optional[float],Field(default=None,gt=0.0,description='height of patient in ms')]
+    weight:Annotated[Optional[float],Field(default=None,gt=0,description='weight of patient in kgs')]
+ 
+
 
 
 def load_data():
