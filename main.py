@@ -1,4 +1,5 @@
 from fastapi import FastAPI,Path,HTTPException,Query
+from fastapi.responses import JSONResponse
 import json
 from pydantic import BaseModel,Field,computed_field,model_validator
 from typing import Annotated,Literal
@@ -29,16 +30,6 @@ class Patient(BaseModel):
             return 'Normal'
         else:
             return 'Obese'
-
-
-        
-    
-    
-        
-           
-        
-    
-    
 
 
 def load_data():
@@ -93,6 +84,17 @@ def sort_patients(sort_by:str=Query(...,detail='sort on basis of key'),order_by:
     sorted_data=sorted(data.values(),key=lambda x:x.get(sort_by,0),reverse=order_by)
     return sorted_data
 
+@app.post('/create')
+def create_patient(patient:Patient):
+    #load data from json
+    data=load_data()
+    # find if id already exsists
+    if patient.id in data:
+        raise HTTPException(status_code=400,detail='bad request already exsists')
+    #serialize
+    data[patient.id]=patient.model_dump(exclude=['id'])
+    save_data(data)
+    return JSONResponse(status_code=201,content={'message':'patient added'})
 
 
 
