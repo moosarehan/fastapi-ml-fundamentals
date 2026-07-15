@@ -47,6 +47,10 @@ def load_data():
 
     return data
 
+def save_data(data):
+    with open('patients.json','w') as f:
+        json.dump(data,f)
+
 @app.get("/")
 def hello():
     return {'message':'hello world !'}
