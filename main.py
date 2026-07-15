@@ -111,3 +111,26 @@ def create_patient(patient:Patient):
 
 
 
+@app.put('/edit/{patient_id}')
+def update_patient(patient_id,update_patient:patientupdate):
+    data=load_data()
+    if patient_id not in data:
+        raise HTTPException(status_code=404,detail='patient not found')
+    exsist_patient=data[patient_id]
+    update=update_patient.model_dump(exclude_unset=True)
+    for key,value in update.items():
+        exsist_patient[key]=value
+    exsist_patient['id']=patient_id
+    patient=Patient(**exsist_patient)
+    updated=patient.model_dump(exclude=['id'])
+    data[patient_id]=updated
+    save_data(data)
+    return JSONResponse(status_code=200,content={'message':'Ok'})
+
+
+
+
+    
+
+
+
